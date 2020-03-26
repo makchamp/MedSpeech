@@ -17,4 +17,4 @@ def listen():
     )
 
     for phrase in speech:
-        print(speech)
+        print(phrase)
