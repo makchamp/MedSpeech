@@ -1,6 +1,6 @@
 
-'use strict'
-import React, { useState } from 'react';
+
+import React from 'react';
 import '@rmwc/button/styles';
 import '@rmwc/textfield/styles';
 import { TextField } from '@rmwc/textfield';
@@ -37,26 +37,29 @@ const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecogni
 const recognition = new SpeechRecognition()
 recognition.lang = 'en-US'
 //To increase accuracy interimResults can be set to false
-recognition.interimResults = true
+recognition.interimResults = false
 
 
 
 
 class Speech extends Component {
 
-    constructor() {
+    constructor(fieldLabel) {
         super()
         this.toggleListen = this.toggleListen.bind(this)
         this.handleListen = this.handleListen.bind(this)
         this.state = {
             listening: false,
+            TextFieldId: ''
+
         }
 
     }
-    toggleListen() {
-        console.log('yo');
+
+    toggleListen(newTextFieldId) {
         this.setState({
-            listening: !this.state.listening
+            listening: !this.state.listening,
+            TextFieldId: newTextFieldId
         }, this.handleListen)
     }
 
@@ -84,61 +87,43 @@ class Speech extends Component {
 
         let finalTranscript = ''
         recognition.onresult = event => {
-            let interimTranscript = ''
-
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 const transcript = event.results[i][0].transcript;
                 if (event.results[i].isFinal) finalTranscript += transcript + ' ';
-                else interimTranscript += transcript;
             }
-            document.getElementById('YAYAYACOCOJUMBO').innerHTML = interimTranscript
-            // document.getElementById('final').innerHTML = finalTranscript
+
 
             //-------------------------COMMANDS------------------------------------
 
             const transcriptArr = finalTranscript.split(' ')
             const stopCmd = transcriptArr.slice(-3, -1)
-            console.log('stopCmd', stopCmd)
+            textFieldChanger(this.state.TextFieldId, finalTranscript)
 
-            if (stopCmd[0] === 'stop' && stopCmd[1] === 'listening') {
+            if (stopCmd[0] === 'stop' && stopCmd[1] === 'recording') {
                 recognition.stop()
+                this.setState({ listening: false })
                 recognition.onend = () => {
-                    console.log('Stopped listening per command')
+                    console.log('Stopped listening per command.')
+
                     const finalText = transcriptArr.slice(0, -3).join(' ')
-                    document.getElementById('YAYAYACOCOJUMBO').innerHTML = finalText
+                    textFieldChanger(this.state.TextFieldId, finalText)
                 }
             }
         }
 
-        //-----------------------------------------------------------------------
-
         recognition.onerror = event => {
             console.log("Error occurred in recognition: " + event.error)
+        }
+
+        function textFieldChanger(id, result) {
+            document.getElementById(id).value = result
         }
 
     }
 
     render() {
         return (
-            <div>
-                <IconButton onClick={this.toggleListen}>
-                    <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                </IconButton>
-                <p id="YAYAYACOCOJUMBO"> yeyho</p>
-            </div>
 
-        )
-    }
-}
-
-
-export function Form() {
-    const [sp, setSp] = useState(new Speech());
-    console.log(sp);
-    return (
-
-        <FormField className='App-header'>
-            <Speech />
             <Card>
                 <Grid>
                     <GridRow style={{ "paddingBottom": "30px" }}>
@@ -150,7 +135,7 @@ export function Form() {
                     </GridRow>
                     <GridRow style={{ "paddingBottom": "20px" }}>
                         <GridCell span={5}>
-                            <TextField label="Height"
+                            <TextField id='HeightTextId' label="Height"
                                 trailingIcon={{
                                     icon: <CloseIcon />,
                                     tabIndex: 0,
@@ -159,13 +144,13 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for height is clicked')}>
+                            <IconButton onClick={() => this.toggleListen('HeightTextId')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
                         <GridCell span={1}></GridCell>
                         <GridCell span={5}>
-                            <TextField label="Weight"
+                            <TextField id='WeightTextId' label="Weight"
                                 trailingIcon={{
                                     icon: <CloseIcon />,
                                     tabIndex: 0,
@@ -174,7 +159,7 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for weight clicked')}>
+                            <IconButton onClick={() => this.toggleListen('WeightTextId')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
@@ -182,7 +167,7 @@ export function Form() {
                     </GridRow>
                     <GridRow style={{ "paddingBottom": "20px" }}>
                         <GridCell span={6}>
-                            <TextField label="Age"
+                            <TextField id='AgeTextId' label="Age"
                                 trailingIcon={{
                                     icon: <CloseIcon />,
                                     tabIndex: 0,
@@ -191,13 +176,13 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for age clicked')}>
+                            <IconButton onClick={() => this.toggleListen('AgeTextId')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
 
                         <GridCell span={6}>
-                            <TextField label="Administration Type"
+                            <TextField id='AdministrationTextId' label="Administration Type"
                                 trailingIcon={{
                                     icon: <CloseIcon />,
                                     tabIndex: 0,
@@ -206,14 +191,14 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for administration type clicked')}>
+                            <IconButton onClick={() => this.toggleListen('AdministrationTextId')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
                     </GridRow>
                     <GridRow style={{ "paddingBottom": "20px" }}>
                         <GridCell span={12}>
-                            <TextField fullwidth label="Medication Type"
+                            <TextField fullwidth id='MedicationTypeTextId' label="Medication Type"
                                 trailingIcon={{
                                     icon: <CloseIcon />,
                                     tabIndex: 0,
@@ -222,17 +207,17 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for medication type clicked')}>
+                            <IconButton onClick={() => this.toggleListen('MedicationTypeTextId')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
                     </GridRow>
                     <GridRow>
                         <GridCell span={4} >
-                            <Button outlined unelevated style={{ "float": "left", "clear": "none" }}>
+                            {/* <Button outlined unelevated style={{ "float": "left", "clear": "none" }}>
                                 <div style={{ "float": "left", "width": "80%" }}><Typography use={'headline6'}>Record:</Typography></div>
                                 <div style={{ "float": "right", "width": "15%", "paddingTop": "3px" }}><Mic /></div>
-                            </Button>
+                            </Button> */}
                         </GridCell>
                         <GridCell span={5} />
                         <GridCell span={3}>
@@ -241,6 +226,15 @@ export function Form() {
                     </GridRow>
                 </Grid>
             </Card>
+        )
+    }
+}
+
+
+export function Form() {
+    return (
+        <FormField className='App-header'>
+            <Speech />
         </FormField>
     )
 }
