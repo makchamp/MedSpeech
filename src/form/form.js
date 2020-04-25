@@ -1,4 +1,6 @@
-import React from 'react'
+
+'use strict'
+import React, { useState } from 'react';
 import '@rmwc/button/styles';
 import '@rmwc/textfield/styles';
 import { TextField } from '@rmwc/textfield';
@@ -21,15 +23,129 @@ import { Button } from '@rmwc/button';
 import Mic from '@material-ui/icons/Mic';
 import { IconButton } from '@material-ui/core';
 
+
+
+import { Component } from 'react';
+// import SpeechRecognition from 'react-speech-recognition'
+
+
+
+
+
+
+const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition
+const recognition = new SpeechRecognition()
+recognition.lang = 'en-US'
+//To increase accuracy interimResults can be set to false
+recognition.interimResults = true
+
+
+
+
+class Speech extends Component {
+
+    constructor() {
+        super()
+        this.toggleListen = this.toggleListen.bind(this)
+        this.handleListen = this.handleListen.bind(this)
+        this.state = {
+            listening: false,
+        }
+
+    }
+    toggleListen() {
+        console.log('yo');
+        this.setState({
+            listening: !this.state.listening
+        }, this.handleListen)
+    }
+
+    handleListen() {
+
+        console.log('listening?', this.state.listening)
+
+        if (this.state.listening) {
+            recognition.start()
+            recognition.onend = () => {
+                console.log("...continue listening...")
+                recognition.start()
+            }
+
+        } else {
+            recognition.stop()
+            recognition.onend = () => {
+                console.log("Stopped listening per click")
+            }
+        }
+
+        recognition.onstart = () => {
+            console.log("Listening!")
+        }
+
+        let finalTranscript = ''
+        recognition.onresult = event => {
+            let interimTranscript = ''
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) finalTranscript += transcript + ' ';
+                else interimTranscript += transcript;
+            }
+            document.getElementById('YAYAYACOCOJUMBO').innerHTML = interimTranscript
+            // document.getElementById('final').innerHTML = finalTranscript
+
+            //-------------------------COMMANDS------------------------------------
+
+            const transcriptArr = finalTranscript.split(' ')
+            const stopCmd = transcriptArr.slice(-3, -1)
+            console.log('stopCmd', stopCmd)
+
+            if (stopCmd[0] === 'stop' && stopCmd[1] === 'listening') {
+                recognition.stop()
+                recognition.onend = () => {
+                    console.log('Stopped listening per command')
+                    const finalText = transcriptArr.slice(0, -3).join(' ')
+                    document.getElementById('YAYAYACOCOJUMBO').innerHTML = finalText
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------------
+
+        recognition.onerror = event => {
+            console.log("Error occurred in recognition: " + event.error)
+        }
+
+    }
+
+    render() {
+        return (
+            <div>
+                <IconButton onClick={this.toggleListen}>
+                    <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
+                </IconButton>
+                <p id="YAYAYACOCOJUMBO"> yeyho</p>
+            </div>
+
+        )
+    }
+}
+
+
 export function Form() {
+    const [sp, setSp] = useState(new Speech());
+    console.log(sp);
     return (
+
         <FormField className='App-header'>
+            <Speech />
             <Card>
                 <Grid>
                     <GridRow style={{ "paddingBottom": "30px" }}>
                         <GridCell span={12} >
-                            <Typography use={"headline4"}>Patient X</Typography>
+                            <div use={"headline4"}>Patient X</div>
                             <div className={"mdc-list-divider"} />
+
                         </GridCell>
                     </GridRow>
                     <GridRow style={{ "paddingBottom": "20px" }}>
@@ -43,7 +159,7 @@ export function Form() {
                             />
                         </GridCell>
                         <GridCell>
-                            <IconButton onClick={() => console.log('mic for height clicked')}>
+                            <IconButton onClick={() => console.log('mic for height is clicked')}>
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
@@ -79,7 +195,7 @@ export function Form() {
                                 <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
                             </IconButton>
                         </GridCell>
-                        
+
                         <GridCell span={6}>
                             <TextField label="Administration Type"
                                 trailingIcon={{
