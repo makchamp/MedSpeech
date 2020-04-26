@@ -51,6 +51,7 @@ class Speech extends Component {
         this.state = {
             listening: false,
             TextFieldId: '',
+            listenAll: false,
             textFields: [
                 {
                     id:'HeightTextId', placeholder:'Height'
@@ -110,14 +111,27 @@ class Speech extends Component {
 
 
             //-------------------------COMMANDS------------------------------------
-
+            if (this.state.listenAll) {
+                let values = finalTranscript.split("is")
+                if (values.length > 1) {
+                    values = values.slice(1, values.length)
+                    console.log(values)
+                    values.forEach((value, index) => {
+                        let newValue = value.split(' ')[1]
+                        console.log(newValue)
+                        if (this.state.textFields[index] != null) textFieldChanger(this.state.textFields[index].id, newValue)
+                    })
+                }
+            } else {
+                textFieldChanger(this.state.TextFieldId, finalTranscript)
+            }
             const transcriptArr = finalTranscript.split(' ')
             const stopCmd = transcriptArr.slice(-3, -1)
-            textFieldChanger(this.state.TextFieldId, finalTranscript)
+
 
             if (stopCmd[0] === 'stop' && stopCmd[1] === 'recording') {
                 recognition.stop()
-                this.setState({ listening: false })
+                this.setState({ listening: false, listenAll: false })
                 recognition.onend = () => {
                     console.log('Stopped listening per command.')
 
@@ -132,7 +146,7 @@ class Speech extends Component {
         }
 
         function textFieldChanger(id, result) {
-            document.getElementById(id).value = result
+            if (id != null && document.getElementById(id) != null) document.getElementById(id).value = result
         }
 
     }
@@ -140,8 +154,8 @@ class Speech extends Component {
     render() {
         return (
 
-            <Card>
-                <Grid>
+            <Card style={{"width": "60%"}}>
+                <Grid style={{"width": "100%"}}>
                     <GridRow style={{ "paddingBottom": "10px" }}>
                         <GridCell span={12} >
                             <Typography use={"headline4"}>Patient X</Typography>
@@ -155,6 +169,10 @@ class Speech extends Component {
                                 label={<Typography use={"headline6"}>Start Recording</Typography>}
                                 icon={<Mic/>}
                                 style={{"width":"100%"}}
+                                onClick={() => {
+                                    this.setState({listenAll: !this.state.listenAll});
+                                    this.toggleListen('')
+                                }}
                             />
                         </GridCell>
                     </GridRow>
@@ -162,7 +180,7 @@ class Speech extends Component {
                     {
                         this.state.textFields.map(({id, placeholder}) => {
                             return (
-                                <GridRow style={{ "paddingBottom": "20px" }}>
+                                <GridRow style={{ "paddingBottom": "50px" }}>
                                     <GridCell span={12}>
                                         <InputField id={id} placeholder={placeholder} toggleListen={this.toggleListen} />
                                     </GridCell>
@@ -184,12 +202,17 @@ class Speech extends Component {
 
 function InputField({id, placeholder, toggleListen}) {
     return (
-        <TextField fullwidth id={id} placeholder={placeholder}
-                   trailingIcon={{
-                       icon: <MicButton toggleListen={() => {toggleListen(id)}}/>,
-                       tabIndex: 0,
-                       onClick: () => console.log('Clear')
-                   }}
+        <TextField
+            fullwidth
+            id={id}
+            placeholder={placeholder}
+            trailingIcon={{
+                icon: <MicButton toggleListen={() => {
+                    toggleListen(id)
+                }}/>,
+                tabIndex: 0,
+                onClick: () => console.log('Clear')
+            }}
         />
     )
 }
