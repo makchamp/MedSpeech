@@ -1,6 +1,6 @@
 
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import '@rmwc/button/styles';
 import '@rmwc/textfield/styles';
 import { TextField } from '@rmwc/textfield';
@@ -52,21 +52,22 @@ class Speech extends Component {
             listening: false,
             TextFieldId: '',
             listenAll: false,
+            statusColor: '',
             textFields: [
                 {
-                    id:'HeightTextId', placeholder:'Height', isANum: true
+                    id: 'HeightTextId', placeholder: 'Height', isANum: true
                 },
                 {
-                    id:'WeightTextId', placeholder:'Weight', isANum: true
+                    id: 'WeightTextId', placeholder: 'Weight', isANum: true
                 },
                 {
-                    id:'AgeTextId', placeholder:'Age', isANum: true
+                    id: 'AgeTextId', placeholder: 'Age', isANum: true
                 },
                 {
-                    id:'AdministrationTextId', placeholder:"Administration Type", isANum: true
+                    id: 'AdministrationTextId', placeholder: "Administration Type", isANum: true
                 },
                 {
-                    id:'MedicationTypeTextId', placeholder:'Medication Type', isANum: false
+                    id: 'MedicationTypeTextId', placeholder: 'Medication Type', isANum: false
                 }
             ]
         }
@@ -78,6 +79,7 @@ class Speech extends Component {
             listening: !this.state.listening,
             TextFieldId: newTextFieldId
         }, this.handleListen)
+        document.getElementById("status").innerHTML = "Listening ... "
     }
 
     handleListen() {
@@ -93,6 +95,7 @@ class Speech extends Component {
 
         } else {
             recognition.stop()
+            document.getElementById("status").innerHTML = ""
             recognition.onend = () => {
                 console.log("Stopped listening per click")
             }
@@ -129,6 +132,7 @@ class Speech extends Component {
 
             if (stopCmd[0] === 'stop' && stopCmd[1] === 'recording') {
                 recognition.stop()
+                document.getElementById("status").innerHTML = ""
                 this.setState({ listening: false, listenAll: false })
                 recognition.onend = () => {
                     console.log('Stopped listening per command.')
@@ -150,10 +154,15 @@ class Speech extends Component {
     }
 
     render() {
+
         return (
 
-            <Card style={{"width": "60%"}}>
-                <Grid style={{"width": "100%"}}>
+
+            <Card style={{ "width": "60%" }}>
+               
+                <div id="status" style={{ "color": "red", "fontSize": "24", "text-align": "center", "font-weight": "bold", "paddingTop": "15px" }}></div>
+               
+                <Grid style={{ "width": "100%" }}>
                     <GridRow style={{ "paddingBottom": "10px" }}>
                         <GridCell span={12} >
                             <Typography use={"headline4"}>Patient X</Typography>
@@ -165,10 +174,10 @@ class Speech extends Component {
                             <Button
                                 outlined unelevated
                                 label={<Typography use={"headline6"}>Start Recording</Typography>}
-                                icon={<Mic/>}
-                                style={{"width":"100%"}}
+                                icon={<Mic />}
+                                style={{ "width": "100%" }}
                                 onClick={() => {
-                                    this.setState({listenAll: !this.state.listenAll});
+                                    this.setState({ listenAll: !this.state.listenAll });
                                     this.toggleListen('')
                                 }}
                             />
@@ -176,7 +185,7 @@ class Speech extends Component {
                     </GridRow>
 
                     {
-                        this.state.textFields.map(({id, placeholder, isANum}) => {
+                        this.state.textFields.map(({ id, placeholder, isANum }) => {
                             return (
                                 <GridRow style={{ "paddingBottom": "50px" }}>
                                     <GridCell span={12}>
@@ -198,15 +207,15 @@ class Speech extends Component {
                         </GridCell>
                     </GridRow>
                 </Grid>
-            </Card>
+            </Card >
         )
     }
 }
 
 function getInvalidatedInputs(arr) {
     let errString = ""
-    arr.forEach(({id, placeholder, isANum}) => {
-        let regex = isANum? /[0-9]*/: /[A-z]*/
+    arr.forEach(({ id, placeholder, isANum }) => {
+        let regex = isANum ? /[0-9]*/ : /[A-z]*/
 
         if (document.getElementById(id).value == null || document.getElementById(id).value === "") {
             errString += placeholder.split("(")[0] + " was not filled out, "
@@ -227,7 +236,7 @@ function matchesRegex(value, regex) {
     return false;
 }
 
-function InputField({id, placeholder, isANum, toggleListen}) {
+function InputField({ id, placeholder, isANum, toggleListen }) {
     return (
         <TextField
             fullwidth
@@ -236,16 +245,16 @@ function InputField({id, placeholder, isANum, toggleListen}) {
             trailingIcon={{
                 icon: <MicButton toggleListen={() => {
                     toggleListen(id)
-                }}/>,
+                }} />,
                 tabIndex: 0,
                 onClick: () => console.log('Clear')
             }}
-            pattern={isANum? "[0-9]*": "[A-z]*"}
+            pattern={isANum ? "[0-9]*" : "[A-z]*"}
         />
     )
 }
 
-function MicButton({toggleListen}) {
+function MicButton({ toggleListen }) {
     return (
         <IconButton onClick={() => toggleListen()}>
             <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
@@ -254,18 +263,18 @@ function MicButton({toggleListen}) {
 }
 
 
-export function Form({setError}) {
+export function Form({ setError }) {
     let [topPadding, setTopPadding] = useState(0)
     return (
-        <FormField className='App-header' style={{"padding-top": topPadding + "px"}}>
-            <Speech setError={(error)=> {
+        <FormField className='App-header' style={{ "padding-top": topPadding + "px" }}>
+            <Speech setError={(error) => {
                 setError(error)
                 if (error !== "") {
                     setTopPadding(50)
                 } else {
                     setTopPadding(0)
                 }
-            }}/>
+            }} />
         </FormField>
     )
 }
