@@ -142,17 +142,25 @@ class Speech extends Component {
 
             <Card>
                 <Grid>
-                    <GridRow style={{ "paddingBottom": "30px" }}>
+                    <GridRow style={{ "paddingBottom": "10px" }}>
                         <GridCell span={12} >
                             <Typography use={"headline4"}>Patient X</Typography>
                             <div className={"mdc-list-divider"} />
-
+                        </GridCell>
+                    </GridRow>
+                    <GridRow style={{ "paddingBottom": "30px" }}>
+                        <GridCell span={12}>
+                            <Button
+                                outlined unelevated
+                                label={<Typography use={"headline6"}>Start Recording</Typography>}
+                                icon={<Mic/>}
+                                style={{"width":"100%"}}
+                            />
                         </GridCell>
                     </GridRow>
 
                     {
                         this.state.textFields.map(({id, placeholder}) => {
-                            //console.log(id)
                             return (
                                 <GridRow style={{ "paddingBottom": "20px" }}>
                                     <GridCell span={12}>
