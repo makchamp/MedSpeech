@@ -7,7 +7,6 @@ import { TextField } from '@rmwc/textfield';
 import '@rmwc/icon/styles';
 import { FormField } from '@rmwc/formfield';
 import '@rmwc/formfield/styles';
-import CloseIcon from '@material-ui/icons/Close';
 import { Grid, GridRow, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Card } from "@rmwc/card";
@@ -199,8 +198,11 @@ class Speech extends Component {
                         <GridCell span={9} />
                         <GridCell span={3}>
                             <Button outlined ripple onClick={() => {
-                                console.log(this.props)
-                                this.props.setError(getInvalidatedInputs(this.state.textFields))
+                                let errorFeedback = getInvalidatedInputs(this.state.textFields)
+                                this.props.setError(errorFeedback)
+                                if (errorFeedback === "") {
+                                    this.props.setFormState()
+                                }
                             }}>
                                 Confirm
                             </Button>
@@ -263,7 +265,7 @@ function MicButton({ toggleListen }) {
 }
 
 
-export function Form({ setError }) {
+export function Form({ setError, setFormState }) {
     let [topPadding, setTopPadding] = useState(0)
     return (
         <FormField className='App-header' style={{ "padding-top": topPadding + "px" }}>
@@ -274,7 +276,9 @@ export function Form({ setError }) {
                 } else {
                     setTopPadding(0)
                 }
-            }} />
+            }}
+                    setFormState={() => setFormState()}
+            />
         </FormField>
     )
 }
