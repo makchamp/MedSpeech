@@ -7,6 +7,7 @@ import { TextField } from '@rmwc/textfield';
 import '@rmwc/icon/styles';
 import { FormField } from '@rmwc/formfield';
 import '@rmwc/formfield/styles';
+
 import { Grid, GridRow, GridCell } from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Card } from "@rmwc/card";
@@ -276,6 +277,7 @@ export function Form({ setError, setFormState }) {
                 } else {
                     setTopPadding(0)
                 }
+
             }}
                     setFormState={() => setFormState()}
             />
