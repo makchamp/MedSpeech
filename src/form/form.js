@@ -1,6 +1,6 @@
 
 
-import React from 'react';
+import React, {useState} from 'react';
 import '@rmwc/button/styles';
 import '@rmwc/textfield/styles';
 import { TextField } from '@rmwc/textfield';
@@ -54,19 +54,19 @@ class Speech extends Component {
             listenAll: false,
             textFields: [
                 {
-                    id:'HeightTextId', placeholder:'Height'
+                    id:'HeightTextId', placeholder:'Height', isANum: true
                 },
                 {
-                    id:'WeightTextId', placeholder:'Weight'
+                    id:'WeightTextId', placeholder:'Weight', isANum: true
                 },
                 {
-                    id:'AgeTextId', placeholder:'Age'
+                    id:'AgeTextId', placeholder:'Age', isANum: true
                 },
                 {
-                    id:'AdministrationTextId', placeholder:"Administration Type"
+                    id:'AdministrationTextId', placeholder:"Administration Type", isANum: true
                 },
                 {
-                    id:'MedicationTypeTextId', placeholder:'Medication Type'
+                    id:'MedicationTypeTextId', placeholder:'Medication Type', isANum: false
                 }
             ]
         }
@@ -115,10 +115,8 @@ class Speech extends Component {
                 let values = finalTranscript.split("is")
                 if (values.length > 1) {
                     values = values.slice(1, values.length)
-                    console.log(values)
                     values.forEach((value, index) => {
                         let newValue = value.split(' ')[1]
-                        console.log(newValue)
                         if (this.state.textFields[index] != null) textFieldChanger(this.state.textFields[index].id, newValue)
                     })
                 }
@@ -178,11 +176,11 @@ class Speech extends Component {
                     </GridRow>
 
                     {
-                        this.state.textFields.map(({id, placeholder}) => {
+                        this.state.textFields.map(({id, placeholder, isANum}) => {
                             return (
                                 <GridRow style={{ "paddingBottom": "50px" }}>
                                     <GridCell span={12}>
-                                        <InputField id={id} placeholder={placeholder} toggleListen={this.toggleListen} />
+                                        <InputField id={id} placeholder={placeholder} isANum={isANum} toggleListen={this.toggleListen} />
                                     </GridCell>
                                 </GridRow>
                             )
@@ -191,7 +189,12 @@ class Speech extends Component {
                     <GridRow>
                         <GridCell span={9} />
                         <GridCell span={3}>
-                            <Button outlined ripple>Confirm</Button>
+                            <Button outlined ripple onClick={() => {
+                                console.log(this.props)
+                                this.props.setError(getInvalidatedInputs(this.state.textFields))
+                            }}>
+                                Confirm
+                            </Button>
                         </GridCell>
                     </GridRow>
                 </Grid>
@@ -200,7 +203,31 @@ class Speech extends Component {
     }
 }
 
-function InputField({id, placeholder, toggleListen}) {
+function getInvalidatedInputs(arr) {
+    let errString = ""
+    arr.forEach(({id, placeholder, isANum}) => {
+        let regex = isANum? /[0-9]*/: /[A-z]*/
+
+        if (document.getElementById(id).value == null || document.getElementById(id).value === "") {
+            errString += placeholder.split("(")[0] + " was not filled out, "
+        } else if (!matchesRegex(document.getElementById(id).value, regex)) {
+            if (isANum) {
+                errString += placeholder.split("(")[0] + " should not include any letters, "
+            } else {
+                errString += placeholder.split("(")[0] + " should not include any numbers, "
+            }
+        }
+    })
+    return errString.slice(0, errString.length - 2)
+}
+
+function matchesRegex(value, regex) {
+    let split = value.split(regex)
+    if (split.length === 2 && split[0] === "" && split[1] === "") return true;
+    return false;
+}
+
+function InputField({id, placeholder, isANum, toggleListen}) {
     return (
         <TextField
             fullwidth
@@ -213,6 +240,7 @@ function InputField({id, placeholder, toggleListen}) {
                 tabIndex: 0,
                 onClick: () => console.log('Clear')
             }}
+            pattern={isANum? "[0-9]*": "[A-z]*"}
         />
     )
 }
@@ -226,10 +254,18 @@ function MicButton({toggleListen}) {
 }
 
 
-export function Form() {
+export function Form({setError}) {
+    let [topPadding, setTopPadding] = useState(0)
     return (
-        <FormField className='App-header'>
-            <Speech />
+        <FormField className='App-header' style={{"padding-top": topPadding + "px"}}>
+            <Speech setError={(error)=> {
+                setError(error)
+                if (error !== "") {
+                    setTopPadding(50)
+                } else {
+                    setTopPadding(0)
+                }
+            }}/>
         </FormField>
     )
 }
