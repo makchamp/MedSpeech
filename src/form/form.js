@@ -50,8 +50,24 @@ class Speech extends Component {
         this.handleListen = this.handleListen.bind(this)
         this.state = {
             listening: false,
-            TextFieldId: ''
-
+            TextFieldId: '',
+            textFields: [
+                {
+                    id:'HeightTextId', placeholder:'Height'
+                },
+                {
+                    id:'WeightTextId', placeholder:'Weight'
+                },
+                {
+                    id:'AgeTextId', placeholder:'Age'
+                },
+                {
+                    id:'AdministrationTextId', placeholder:"Administration Type"
+                },
+                {
+                    id:'MedicationTypeTextId', placeholder:'Medication Type'
+                }
+            ]
         }
 
     }
@@ -128,98 +144,26 @@ class Speech extends Component {
                 <Grid>
                     <GridRow style={{ "paddingBottom": "30px" }}>
                         <GridCell span={12} >
-                            <div use={"headline4"}>Patient X</div>
+                            <Typography use={"headline4"}>Patient X</Typography>
                             <div className={"mdc-list-divider"} />
 
                         </GridCell>
                     </GridRow>
-                    <GridRow style={{ "paddingBottom": "20px" }}>
-                        <GridCell span={5}>
-                            <TextField id='HeightTextId' label="Height"
-                                trailingIcon={{
-                                    icon: <CloseIcon />,
-                                    tabIndex: 0,
-                                    onClick: () => console.log('Clear')
-                                }}
-                            />
-                        </GridCell>
-                        <GridCell>
-                            <IconButton onClick={() => this.toggleListen('HeightTextId')}>
-                                <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                            </IconButton>
-                        </GridCell>
-                        <GridCell span={1}></GridCell>
-                        <GridCell span={5}>
-                            <TextField id='WeightTextId' label="Weight"
-                                trailingIcon={{
-                                    icon: <CloseIcon />,
-                                    tabIndex: 0,
-                                    onClick: () => console.log('Clear')
-                                }}
-                            />
-                        </GridCell>
-                        <GridCell>
-                            <IconButton onClick={() => this.toggleListen('WeightTextId')}>
-                                <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                            </IconButton>
-                        </GridCell>
-                        <GridCell span={1}></GridCell>
-                    </GridRow>
-                    <GridRow style={{ "paddingBottom": "20px" }}>
-                        <GridCell span={6}>
-                            <TextField id='AgeTextId' label="Age"
-                                trailingIcon={{
-                                    icon: <CloseIcon />,
-                                    tabIndex: 0,
-                                    onClick: () => console.log('Clear')
-                                }}
-                            />
-                        </GridCell>
-                        <GridCell>
-                            <IconButton onClick={() => this.toggleListen('AgeTextId')}>
-                                <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                            </IconButton>
-                        </GridCell>
 
-                        <GridCell span={6}>
-                            <TextField id='AdministrationTextId' label="Administration Type"
-                                trailingIcon={{
-                                    icon: <CloseIcon />,
-                                    tabIndex: 0,
-                                    onClick: () => console.log('Clear')
-                                }}
-                            />
-                        </GridCell>
-                        <GridCell>
-                            <IconButton onClick={() => this.toggleListen('AdministrationTextId')}>
-                                <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                            </IconButton>
-                        </GridCell>
-                    </GridRow>
-                    <GridRow style={{ "paddingBottom": "20px" }}>
-                        <GridCell span={12}>
-                            <TextField fullwidth id='MedicationTypeTextId' label="Medication Type"
-                                trailingIcon={{
-                                    icon: <CloseIcon />,
-                                    tabIndex: 0,
-                                    onClick: () => console.log('Clear')
-                                }}
-                            />
-                        </GridCell>
-                        <GridCell>
-                            <IconButton onClick={() => this.toggleListen('MedicationTypeTextId')}>
-                                <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
-                            </IconButton>
-                        </GridCell>
-                    </GridRow>
+                    {
+                        this.state.textFields.map(({id, placeholder}) => {
+                            //console.log(id)
+                            return (
+                                <GridRow style={{ "paddingBottom": "20px" }}>
+                                    <GridCell span={12}>
+                                        <InputField id={id} placeholder={placeholder} toggleListen={this.toggleListen} />
+                                    </GridCell>
+                                </GridRow>
+                            )
+                        })
+                    }
                     <GridRow>
-                        <GridCell span={4} >
-                            {/* <Button outlined unelevated style={{ "float": "left", "clear": "none" }}>
-                                <div style={{ "float": "left", "width": "80%" }}><Typography use={'headline6'}>Record:</Typography></div>
-                                <div style={{ "float": "right", "width": "15%", "paddingTop": "3px" }}><Mic /></div>
-                            </Button> */}
-                        </GridCell>
-                        <GridCell span={5} />
+                        <GridCell span={9} />
                         <GridCell span={3}>
                             <Button outlined ripple>Confirm</Button>
                         </GridCell>
@@ -228,6 +172,26 @@ class Speech extends Component {
             </Card>
         )
     }
+}
+
+function InputField({id, placeholder, toggleListen}) {
+    return (
+        <TextField fullwidth id={id} placeholder={placeholder}
+                   trailingIcon={{
+                       icon: <MicButton toggleListen={() => {toggleListen(id)}}/>,
+                       tabIndex: 0,
+                       onClick: () => console.log('Clear')
+                   }}
+        />
+    )
+}
+
+function MicButton({toggleListen}) {
+    return (
+        <IconButton onClick={() => toggleListen()}>
+            <div style={{ "float": "right", "width": "100%", "height": "100%", "paddingTop": "4px" }}><Mic /></div>
+        </IconButton>
+    )
 }
 
 
