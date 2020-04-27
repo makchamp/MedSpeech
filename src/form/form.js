@@ -193,7 +193,7 @@ class Speech extends Component {
                     {
                         this.state.textFields.map(({ id, placeholder, isANum }, index) => {
                             return (
-                                <GridRow style={{ "paddingBottom": "50px" }}>
+                                <GridRow style={{ "paddingBottom": "20px" }}>
                                     <GridCell span={12}>
                                         <Checkbox
                                             style={{"width": "98%"}}
