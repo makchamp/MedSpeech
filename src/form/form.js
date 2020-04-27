@@ -121,11 +121,11 @@ class Speech extends Component {
 
             //-------------------------COMMANDS------------------------------------
             if (this.state.listenAll) {
-                let values = finalTranscript.split("is")
+                let values = finalTranscript.split(" is ")
                 if (values.length > 1) {
                     values = values.slice(1, values.length)
                     values.forEach((value, index) => {
-                        let newValue = value.split(' ')[1]
+                        let newValue = value.split(' ')[0]
                         if (this.state.textFields[index] != null) textFieldChanger(this.state.textFields[index].id, newValue)
                     })
                 }
