@@ -248,7 +248,7 @@ function getCheckBoxFeedback(arr) {
     if (isAllChecked) {
         return ""
     }
-    return "Please have some verify the values that you have inputted before confirming your submission."
+    return "Please have someone verify the values that you have inputted before confirming your submission."
 }
 
 function getInvalidatedInputs(arr) {
