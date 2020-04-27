@@ -4,6 +4,9 @@ import {TopAppBar, TopAppBarRow, TopAppBarSection, TopAppBarTitle, TopAppBarFixe
 import '@rmwc/top-app-bar/styles';
 import '@rmwc/button/styles';
 import { Button } from '@rmwc/button';
+import { Card } from "@rmwc/card";
+import '@rmwc/card/styles';
+import checkmark from "./checkmark.png"
 
 
 function App() {
@@ -47,9 +50,25 @@ function App() {
 
 function Confirm({onClick}) {
     return (
-        <div style={{"text-align": "center", "padding-top": "200px"}}>
-            Confirmed! <Button onClick={() => onClick()}>Next Patient?</Button>
+        <div style={{"text-align": "center", "width": "25%", "margin": "auto"}}>
+            <div style={{"margin-top": "250px", "padding":"20px"}}>
+                <Card outlined style={{"padding":"20px"}}>
+                    <div style={{"display": "flex", "padding-left":"75px"}}>
+                    <span >
+                    <img src={checkmark} style={{"height": "100px", "width": "100px"}}/>
+                </span>
+                        <span style={{"padding-top":"40px"}}>
+                    Confirmed!
+                </span>
+                    </div>
+
+                    <div style={{"padding-top": "10px"}}>
+                        <Button outlined
+                                onClick={() => onClick()}>Next Patient?</Button></div>
+                </Card>
+            </div>
         </div>
+
     )
 }
 

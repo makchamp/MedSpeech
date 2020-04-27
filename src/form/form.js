@@ -8,7 +8,7 @@ import '@rmwc/icon/styles';
 import { FormField } from '@rmwc/formfield';
 import '@rmwc/formfield/styles';
 
-import { Grid, GridRow, GridCell } from '@rmwc/grid';
+import { Grid, GridRow, GridCell} from '@rmwc/grid';
 import '@rmwc/grid/styles';
 import { Card } from "@rmwc/card";
 import '@rmwc/card/styles';
@@ -22,6 +22,9 @@ import { Button } from '@rmwc/button';
 
 import Mic from '@material-ui/icons/Mic';
 import { IconButton } from '@material-ui/core';
+
+import {Checkbox} from '@rmwc/checkbox';
+import '@rmwc/checkbox/styles';
 
 
 
@@ -69,6 +72,9 @@ class Speech extends Component {
                 {
                     id: 'MedicationTypeTextId', placeholder: 'Medication Type', isANum: false
                 }
+            ],
+            checkBoxes: [
+                false, false, false, false, false
             ]
         }
 
@@ -158,7 +164,7 @@ class Speech extends Component {
         return (
 
 
-            <Card style={{ "width": "60%" }}>
+            <Card style={{ "width": "50%" }}>
                
                 <div id="status" style={{ "color": "red", "fontSize": "24", "text-align": "center", "font-weight": "bold", "paddingTop": "15px" }}></div>
                
@@ -185,12 +191,27 @@ class Speech extends Component {
                     </GridRow>
 
                     {
-                        this.state.textFields.map(({ id, placeholder, isANum }) => {
+                        this.state.textFields.map(({ id, placeholder, isANum }, index) => {
                             return (
                                 <GridRow style={{ "paddingBottom": "50px" }}>
                                     <GridCell span={12}>
-                                        <InputField id={id} placeholder={placeholder} isANum={isANum} toggleListen={this.toggleListen} />
+                                        <Checkbox
+                                            style={{"width": "98%"}}
+                                            label={
+                                                    <GridRow>
+                                                        <GridCell span={12}>
+                                                            <InputField id={id} placeholder={placeholder} isANum={isANum} toggleListen={this.toggleListen} />
+                                                        </GridCell>
+                                                    </GridRow>
+                                            }
+                                            checked={this.state.checkBoxes[index]}
+                                            onChange={() => {
+                                                this.state.checkBoxes[index] = !this.state.checkBoxes[index]
+                                                this.setState({checkBoxes: this.state.checkBoxes})
+                                            }}
+                                        />
                                     </GridCell>
+
                                 </GridRow>
                             )
                         })
@@ -198,13 +219,18 @@ class Speech extends Component {
                     <GridRow>
                         <GridCell span={9} />
                         <GridCell span={3}>
-                            <Button outlined ripple onClick={() => {
-                                let errorFeedback = getInvalidatedInputs(this.state.textFields)
-                                this.props.setError(errorFeedback)
-                                if (errorFeedback === "") {
-                                    this.props.setFormState()
-                                }
-                            }}>
+                            <Button
+                                outlined ripple
+                                style={{"float": "right"}}
+                                onClick={() => {
+                                    let errorFeedback = getInvalidatedInputs(this.state.textFields)
+                                    let checkBoxFeedback = getCheckBoxFeedback(this.state.checkBoxes)
+                                    errorFeedback = errorFeedback === "" ? checkBoxFeedback : errorFeedback
+                                    this.props.setError(errorFeedback)
+                                    if (errorFeedback === "") {
+                                        this.props.setFormState()
+                                    }
+                                }}>
                                 Confirm
                             </Button>
                         </GridCell>
@@ -215,10 +241,20 @@ class Speech extends Component {
     }
 }
 
+function getCheckBoxFeedback(arr) {
+    let isAllChecked = arr.reduce((total, value) => {
+        return total && value
+    })
+    if (isAllChecked) {
+        return ""
+    }
+    return "Please have some verify the values that you have inputted before confirming your submission."
+}
+
 function getInvalidatedInputs(arr) {
     let errString = ""
     arr.forEach(({ id, placeholder, isANum }) => {
-        let regex = isANum ? /[0-9]*/ : /[A-z]*/
+        let regex = isANum ? /[0-9]*\s*/ : /[A-z]*\s*/
 
         if (document.getElementById(id).value == null || document.getElementById(id).value === "") {
             errString += placeholder.split("(")[0] + " was not filled out, "
@@ -234,7 +270,10 @@ function getInvalidatedInputs(arr) {
 }
 
 function matchesRegex(value, regex) {
+    console.log(value)
+    console.log(regex)
     let split = value.split(regex)
+    console.log(split)
     if (split.length === 2 && split[0] === "" && split[1] === "") return true;
     return false;
 }

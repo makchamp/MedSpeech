@@ -7,3 +7,10 @@
     font-size: calc(10px + 2vmin);
     background-color: #f6f6f6;
 }
+
+label {
+    width:100%;
+}
+/*.toggle--[object Object]label {*/
+/*    width:100%;*/
+/*                        }*/
